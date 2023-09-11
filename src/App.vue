@@ -6,19 +6,24 @@ import { onMounted, ref } from 'vue';
 import axiosInstance from '@/axios.js';
 import { isAxiosError } from 'axios';
 import AppAlert from './components/AppAlert.vue';
+import AppPagination from './components/AppPagination.vue';
 
 const projects = ref([]);
+const links = ref([])
+const currentPage = ref(1);
 const isLoading = ref(false);
 const alert = ref({
   type: 'info',
   message: 'No projects found'
 })
 
-onMounted(async () => {
+const fetchProjects = async (url = 'http://localhost:8000/api/projects') => {
   isLoading.value = true;
   try {
-    const { data } = await axiosInstance.get('/projects');
+    const { data } = await axiosInstance.get(url);
     projects.value = data.data;
+    links.value = data.links;
+    currentPage.value = data.current_page
 
   } catch (err) {
     alert.value.type = 'warning';
@@ -32,14 +37,26 @@ onMounted(async () => {
   } finally {
     isLoading.value = false;
   }
+}
+
+
+onMounted(() => {
+  fetchProjects();
 })
+
 </script>
 
 <template>
   <div class="container">
+
     <h1 class="text-center my-5 pb-3 border-bottom border-black">
       Boolfolio
     </h1>
+
+    <div class="d-flex justify-content-end">
+      <AppPagination :links="links" :current-page="currentPage"
+        @page-change="fetchProjects" />
+    </div>
 
     <AppLoader v-if="isLoading" />
     <div v-else>
