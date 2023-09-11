@@ -8,6 +8,15 @@ const backendUrl = 'http://localhost:8000/storage/';
 const thumbnail = computed(() => props.project.thumbnail
     ? backendUrl + props.project.thumbnail
     : '');
+
+const formattedCreatedAtDate = computed(() => {
+    const date = new Date(props.project.created_at);
+
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+
+    return `${date.toLocaleDateString()} ${hour}:${minutes}`;
+})
 </script>
 
 <template>
@@ -16,7 +25,7 @@ const thumbnail = computed(() => props.project.thumbnail
         <figure v-if="thumbnail">
             <img :src="thumbnail" :alt="project.name" />
         </figure>
-        <div>
+        <div class="flex-grow-1">
             <div><strong>Project Name: </strong>{{ project.name }}</div>
             <div v-if="project.url">
                 <strong>Url: </strong>
@@ -26,6 +35,10 @@ const thumbnail = computed(() => props.project.thumbnail
                 <font-awesome-icon :icon="['fab', 'github']" size="lg" />:
                 <a :href="project.url" target="_blank">{{ project.github_url }}</a>
             </div>
+        </div>
+        <div class="align-self-end text-end ">
+            <strong>Created at: </strong>
+            {{ formattedCreatedAtDate }}
         </div>
     </div>
 </template>
