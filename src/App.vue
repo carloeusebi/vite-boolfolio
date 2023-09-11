@@ -1,22 +1,36 @@
 <script setup>
+import AppProject from './components/AppProject.vue';
+import AppLoader from './components/AppLoader.vue'
+
 import { onMounted, ref } from 'vue';
 import axiosInstance from '@/axios.js';
 import { isAxiosError } from 'axios';
-import AppProject from './components/AppProject.vue';
+import AppAlert from './components/AppAlert.vue';
 
 const projects = ref([]);
+const isLoading = ref(false);
+const alert = ref({
+  type: 'info',
+  message: 'No projects found'
+})
 
 onMounted(async () => {
-  // call the api to fetch the first projects
+  isLoading.value = true;
   try {
-    //set the loader
     const { data } = await axiosInstance.get('/projects');
     projects.value = data.data;
 
   } catch (err) {
-    //todo errors
+    alert.value.type = 'warning';
+    if (isAxiosError(err)) {
+      const status = err.response.status;
+      alert.value.message = `Error ${status}`
+    }
+    else {
+      alert.value.message = "Ops! Something went wrong, try to reload the page!"
+    }
   } finally {
-    //todo unset the loader
+    isLoading.value = false;
   }
 })
 </script>
@@ -27,11 +41,17 @@ onMounted(async () => {
       Boolfolio
     </h1>
 
-    <ul class="list-unstyled">
-      <li v-for="project in projects" :key="project.id">
-        <AppProject :project="project" />
-      </li>
-    </ul>
+    <AppLoader v-if="isLoading" />
+    <div v-else>
+      <ul v-if="projects && projects.length > 0" class="list-unstyled">
+        <li v-for="project in projects" :key="project.id">
+          <AppProject :project="project" />
+        </li>
+      </ul>
+      <div v-else>
+        <AppAlert :config="alert" />
+      </div>
+    </div>
 
   </div>
 </template>
