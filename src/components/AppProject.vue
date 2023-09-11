@@ -20,7 +20,7 @@ const formattedCreatedAtDate = computed(() => {
 </script>
 
 <template>
-    <div class="d-flex gap-3 border-bottom border-dark-subtle ">
+    <div class="d-flex gap-3 border-bottom border-dark-subtle mb-3">
         <!-- left column -->
         <figure v-if="thumbnail">
             <img :src="thumbnail" :alt="project.name" />
