@@ -33,12 +33,22 @@ const formattedCreatedAtDate = computed(() => {
             </div>
             <div v-if="project.github_url">
                 <font-awesome-icon :icon="['fab', 'github']" size="lg" />:
-                <a :href="project.url" target="_blank">{{ project.github_url }}</a>
+                <a :href="project.url" target="_blank">{{ project.github_url
+                }}</a>
             </div>
         </div>
-        <div class="align-self-end text-end ">
-            <strong>Created at: </strong>
-            {{ formattedCreatedAtDate }}
+        <div class="d-flex flex-column ">
+            <div class="flex-grow-1 d-flex align-items-center justify-content-end ">
+                <RouterLink
+                    :to="{ name: 'project-details', params: { id: project.id } }"
+                    class="btn btn-success ">
+                    Details
+                </RouterLink>
+            </div>
+            <div class="align-self-end text-end ">
+                <strong>Created at: </strong>
+                {{ formattedCreatedAtDate }}
+            </div>
         </div>
     </div>
 </template>
