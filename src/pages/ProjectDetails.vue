@@ -5,6 +5,7 @@ import { computed, onMounted, ref } from 'vue';
 import { loader } from '../stores/loader';
 import { isAxiosError } from 'axios';
 import AppAlert from '../components/AppAlert.vue';
+import ProjectType from '../components/ProjectType.vue';
 
 const id = useRoute().params.id;
 const project = ref(null);
@@ -55,6 +56,7 @@ onMounted(() => {
         <!-- temporary dump -->
         <div v-if="project">
             <h1>{{ project.name }}</h1>
+            <ProjectType v-if="project.type" :type="project.type" />
             <div class="d-flex my-3">
                 <figure>
                     <img :src="thumbnail" :alt="project.name">

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue';
+import ProjectType from './ProjectType.vue';
 
 const props = defineProps({
     project: Object,
@@ -36,6 +37,7 @@ const formattedCreatedAtDate = computed(() => {
                 <a :href="project.url" target="_blank">{{ project.github_url
                 }}</a>
             </div>
+            <ProjectType v-if="project.type" :type="project.type" />
         </div>
         <div class="d-flex flex-column ">
             <div class="flex-grow-1 d-flex align-items-center justify-content-end ">
