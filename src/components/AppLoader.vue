@@ -1,9 +1,9 @@
 <script setup>
-
+import { loader } from '../stores/loader';
 </script>
 
 <template>
-    <div class="layover">
+    <div v-if="loader.isLoading" class="layover">
         <font-awesome-icon class="text-white" :icon="['fas', 'circle-notch']" spin
             size="2xl" />
     </div>
@@ -14,6 +14,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 4;
 
     position: fixed;
     inset: 0;

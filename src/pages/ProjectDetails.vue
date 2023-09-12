@@ -2,13 +2,14 @@
 import { useRoute } from 'vue-router';
 import axiosInstance from '@/axios.js';
 import { onMounted, ref } from 'vue';
+import { loader } from '../stores/loader';
 
 const id = useRoute().params.id;
 const project = ref(null);
 const url = `http://localhost:8000/api/projects/${id}`
 
 const fetchProject = async () => {
-    // set loader
+    loader.setLoader();
     try {
         const { data } = await axiosInstance.get(url);
         project.value = data;
@@ -16,7 +17,7 @@ const fetchProject = async () => {
     } catch (err) {
 
     } finally {
-        // unset loader
+        loader.unsetLoader();
     }
 }
 
@@ -26,6 +27,11 @@ onMounted(() => {
 
 </script>
 
-<template></template>
+<template>
+    <div v-if="!loader.isLoading">
+        <!-- temporary dump -->
+        {{ project }}
+    </div>
+</template>
 
 <style scoped></style>
