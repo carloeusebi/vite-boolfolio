@@ -45,20 +45,35 @@ const alertType = computed(() => hasErrors.value ? 'warning' : 'success');
 
 const validateForm = (form: ContactForm) => {
     errors.value = {};
-    //todo
-    return true;
+    const { email, subject, content } = form;
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    const requiredMessage = 'The %placeholder% field is required!';
+
+    if (!email) {
+        errors.value.email = requiredMessage.replace('%placeholder%', 'email');
+    } else if (!email.match(emailRegex)) errors.value.email = 'The email field must be a valid email address.';
+
+    if (!subject) {
+        errors.value.subject = requiredMessage.replace('%placeholder%', 'subject');
+    }
+
+    if (!content) {
+        errors.value.content = requiredMessage.replace('%placeholder%', 'content');
+    }
+
 }
 
 
 const submitForm = async () => {
     successMessage.value = '';
     validateForm(form.value);
+
     if (hasErrors.value) return;
     try {
         loader.setLoader();
         await axiosInstance.post(url, form.value)
         form.value = { ...emptyForm }
-        successMessage.value = 'Email sent successfully'
+        successMessage.value = 'Email sent successfully!'
     } catch (err) {
         //check if the caught error is an axios error
         if (isAxiosError(err)) {
