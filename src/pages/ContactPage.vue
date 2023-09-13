@@ -1,6 +1,10 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
 import AppAlert from '../components/AppAlert.vue';
+
+import { loader } from '../stores/loader';
+import axiosInstance from '../axios'
+import { isAxiosError } from 'axios';
+import { computed, ref } from 'vue';
 
 interface ContactForm {
     email: string;
@@ -8,17 +12,46 @@ interface ContactForm {
     content: string
 }
 
-const emptyForm = {
+const emptyForm: ContactForm = {
     email: '',
     subject: '',
     content: '',
 }
 
 const form = ref(emptyForm);
+const errors = ref({});
+const successMessage = ref('');
 const url = 'http://localhost:8000/api/contact-form'
 
-const submitForm = () => {
+const hasErrors = computed(() => Object.keys(errors.value).length > 0)
+const showAlert = computed(() => Boolean(hasErrors.value || successMessage.value));
+const alertType = computed(() => hasErrors.value ? 'warning' : 'success');
+const alertMessage = computed(() => hasErrors.value ? 'temp' : successMessage.value);
+
+const validateForm = (form: ContactForm) => {
+    errors.value = {};
+    //todo
     return true;
+}
+
+const submitForm = async () => {
+    successMessage.value = '';
+    validateForm(form.value);
+    if (hasErrors.value) return;
+    try {
+        loader.setLoader();
+        await axiosInstance.post(url, form.value)
+        form.value = { ...emptyForm }
+        successMessage.value = 'Email sent successfully'
+    } catch (err) {
+        if (isAxiosError(err))
+            errors.value = err.response?.data;
+        else
+            console.error(err);
+    } finally {
+        loader.unsetLoader();
+    }
+
 }
 </script>
 
@@ -27,9 +60,10 @@ const submitForm = () => {
 
         <h2 class="text-center mb-3">Send us an email</h2>
 
-        <!-- todo
-    <AppAlert />
--->
+        <AppAlert v-if="showAlert" :config="{ type: alertType }">
+            <div v-if="hasErrors"></div>
+            <div v-else>{{ successMessage }}</div>
+        </AppAlert>
 
         <form @submit.prevent="submitForm" novalidate>
             <!-- email -->
@@ -49,8 +83,8 @@ const submitForm = () => {
             <!-- message -->
             <div class="mb-3">
                 <label for="content">Message:</label>
-                <textarea id="content" class="form-control" cols="30"
-                    rows="10"></textarea>
+                <textarea id="content" class="form-control" cols="30" rows="10"
+                    v-model="form.content"></textarea>
             </div>
 
             <div class="d-flex justify-content-end ">

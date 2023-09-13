@@ -19,8 +19,9 @@ const alertType = computed(() => {
 </script>
 
 <template>
-    <div class="alert" :class="alertType" role="alert" v-html="config.message">
-
+    <div class="alert" :class="alertType" role="alert">
+        <span v-html="config.message"></span>
+        <slot></slot>
     </div>
 </template>
 
