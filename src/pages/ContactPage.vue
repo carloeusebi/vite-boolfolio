@@ -32,7 +32,7 @@ const emptyForm: ContactForm = {
 
 // refs
 
-const form = ref(emptyForm);
+const form = ref({ ...emptyForm });
 const errors = ref<Errors>({});
 const successMessage = ref('');
 
@@ -60,7 +60,6 @@ const validateForm = (form: ContactForm) => {
     if (!content) {
         errors.value.content = requiredMessage.replace('%placeholder%', 'content');
     }
-
 }
 
 
