@@ -6,32 +6,49 @@ import axiosInstance from '../axios'
 import { isAxiosError } from 'axios';
 import { computed, ref } from 'vue';
 
+// interfaces
+
 interface ContactForm {
     email: string;
     subject: string;
     content: string
 }
 
+interface Errors {
+    email?: string;
+    subject?: string;
+    content?: string;
+    generic?: string;
+}
+
+// constants
+
+const url = 'http://localhost:8000/api/contact-form'
 const emptyForm: ContactForm = {
     email: '',
     subject: '',
     content: '',
 }
 
+// refs
+
 const form = ref(emptyForm);
-const errors = ref({});
+const errors = ref<Errors>({});
 const successMessage = ref('');
-const url = 'http://localhost:8000/api/contact-form'
+
+// computed
 
 const hasErrors = computed(() => Object.keys(errors.value).length > 0)
 const showAlert = computed(() => Boolean(hasErrors.value || successMessage.value));
 const alertType = computed(() => hasErrors.value ? 'warning' : 'success');
+
 
 const validateForm = (form: ContactForm) => {
     errors.value = {};
     //todo
     return true;
 }
+
 
 const submitForm = async () => {
     successMessage.value = '';
@@ -85,21 +102,32 @@ const submitForm = async () => {
             <div class="mb-3">
                 <label for="email">Email:</label>
                 <input type="email" id="email" class="form-control"
-                    v-model="form.email">
+                    :class="{ 'is-invalid': errors.email }" v-model="form.email">
+                <div class="invalid-feedback">
+                    {{ errors.email }}
+                </div>
             </div>
 
             <!-- subject -->
             <div class="mb-3">
                 <label for="subject">Subject:</label>
                 <input type="text" id="subject" class="form-control"
+                    :class="{ 'is-invalid': errors.subject }"
                     v-model="form.subject">
+                <div class="invalid-feedback">
+                    {{ errors.subject }}
+                </div>
             </div>
 
             <!-- message -->
             <div class="mb-3">
                 <label for="content">Message:</label>
                 <textarea id="content" class="form-control" cols="30" rows="10"
-                    v-model="form.content"></textarea>
+                    v-model="form.content"
+                    :class="{ 'is-invalid': errors.content }"></textarea>
+                <div class="invalid-feedback">
+                    {{ errors.content }}
+                </div>
             </div>
 
             <div class="d-flex justify-content-end ">
