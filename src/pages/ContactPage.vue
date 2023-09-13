@@ -12,6 +12,7 @@ interface ContactForm {
     email: string;
     subject: string;
     content: string
+    subscribe: boolean;
 }
 
 interface Errors {
@@ -28,6 +29,7 @@ const emptyForm: ContactForm = {
     email: '',
     subject: '',
     content: '',
+    subscribe: false
 }
 
 // refs
@@ -142,6 +144,12 @@ const submitForm = async () => {
                 <div class="invalid-feedback">
                     {{ errors.content }}
                 </div>
+            </div>
+            <div class="mb-3 form-check custom">
+                <input type="checkbox" class="form-check-input" id="subscription"
+                    v-model="form.subscribe">
+                <label for="subscription" class="form-check-label">Subscribe to the
+                    newsletter</label>
             </div>
 
             <div class="d-flex justify-content-end ">
