@@ -26,7 +26,6 @@ const url = 'http://localhost:8000/api/contact-form'
 const hasErrors = computed(() => Object.keys(errors.value).length > 0)
 const showAlert = computed(() => Boolean(hasErrors.value || successMessage.value));
 const alertType = computed(() => hasErrors.value ? 'warning' : 'success');
-const alertMessage = computed(() => hasErrors.value ? 'temp' : successMessage.value);
 
 const validateForm = (form: ContactForm) => {
     errors.value = {};
@@ -44,10 +43,22 @@ const submitForm = async () => {
         form.value = { ...emptyForm }
         successMessage.value = 'Email sent successfully'
     } catch (err) {
-        if (isAxiosError(err))
-            errors.value = err.response?.data;
-        else
+        //check if the caught error is an axios error
+        if (isAxiosError(err)) {
+            // if the error is a bad or unprocessable request (400 or 422) manipulate the error messages
+            if (err.response?.status === 400 || err.response?.status === 422) {
+                const errorsInResponse = err.response?.data.errors;
+                for (let field in errorsInResponse) errors.value[field] = errorsInResponse[field][0];
+            } else {
+                // if error is axios error but not 400 or 404 respond with a generic server error message
+                errors.value = { generic: 'Si è verificato un problema con il server' }
+            }
+        }
+        else {
+            // if error is not axios error it means is a front end code generated error, respond with a different generic server error message
+            errors.value = { generic: 'Si è verificato un errore interno, si prega di riprovare' }
             console.error(err);
+        }
     } finally {
         loader.unsetLoader();
     }
@@ -61,7 +72,11 @@ const submitForm = async () => {
         <h2 class="text-center mb-3">Send us an email</h2>
 
         <AppAlert v-if="showAlert" :config="{ type: alertType }">
-            <div v-if="hasErrors"></div>
+            <div v-if="hasErrors">
+                <ul class="list-unstyled">
+                    <li v-for="error in errors">{{ error }}</li>
+                </ul>
+            </div>
             <div v-else>{{ successMessage }}</div>
         </AppAlert>
 
